@@ -508,8 +508,14 @@ class Installer:
             if file_copied:
                 self.did_install_something = True
                 try:
-                    depfixer.fix_rpath(outname, install_rpath, final_path,
-                                       install_name_mappings, verbose=False)
+                    # Buildroot check-host-rpath script expects RPATH
+                    # But if install_rpath is empty, it will stripped.
+                    # So, preserve it in this case
+                    if install_rpath:
+                        depfixer.fix_rpath(outname, install_rpath, final_path,
+                                           install_name_mappings, verbose=False)
+                    else:
+                        print("Skipping RPATH fixing")
                 except SystemExit as e:
                     if isinstance(e.code, int) and e.code == 0:
                         pass
