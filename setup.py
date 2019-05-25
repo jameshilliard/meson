@@ -51,6 +51,7 @@ if __name__ == '__main__':
           url='http://mesonbuild.com',
           license=' Apache License, Version 2.0',
           python_requires='>=3.5',
+          extras_require={'progress': ['tqdm']},
           packages=packages,
           package_data=package_data,
           entry_points=entries,

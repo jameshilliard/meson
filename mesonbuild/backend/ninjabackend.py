@@ -20,7 +20,13 @@ import subprocess
 from collections import OrderedDict
 import itertools
 from pathlib import PurePath, Path
-from functools import lru_cache
+from functools import partial, lru_cache
+
+try:
+    from tqdm import tqdm as _tqdm
+    tqdm = partial(_tqdm, leave=False, ncols=100)
+except ImportError:
+    tqdm = lambda x, **kwargs: x
 
 from . import backends
 from .. import modules
@@ -287,7 +293,7 @@ int dummy;
             self.build_elements = []
             self.generate_phony()
             self.add_build_comment(NinjaComment('Build rules for targets'))
-            for t in self.build.get_targets().values():
+            for t in tqdm(self.build.get_targets().values(), desc='Generating targets'):
                 self.generate_target(t)
             self.add_build_comment(NinjaComment('Test rules'))
             self.generate_tests()
@@ -891,7 +897,7 @@ int dummy;
             r.write(outfile)
 
     def write_builds(self, outfile):
-        for b in self.build_elements:
+        for b in tqdm(self.build_elements, desc='Writing build.ninja'):
             b.write(outfile)
 
     def generate_phony(self):
